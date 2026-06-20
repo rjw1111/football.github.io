@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJB-BTI 世界杯球星人格测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a472a 0%, #2d6a4f 50%, #40916c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .mbti-container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .mbti-header {
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .mbti-header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .mbti-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            height: 6px;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .progress-text {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        .question-container {
+            padding: 30px;
+        }
+        .question-number {
+            color: #2d6a4f;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .option:hover {
+            border-color: #52b788;
+            background: #f0fff4;
+            transform: translateX(5px);
+        }
+        .option.selected {
+            border-color: #52b788;
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+        }
+        .option-text {
+            line-height: 1.6;
+            padding: 10px 0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 20px 30px 30px;
+        }
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .prev-btn {
+            background: #e9ecef;
+            color: #666;
+        }
+        .prev-btn:hover {
+            background: #dee2e6;
+        }
+        .next-btn {
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+        }
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
+        }
+        .next-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 40px 30px;
+        }
+        .result-container.show {
+            display: block;
+        }
+        .result-badge {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            line-height: 1.3;
+        }
+        .result-badge.messi { background: linear-gradient(135deg, #3498db 0%, #1a5276 100%); }
+        .result-badge.ronaldo { background: linear-gradient(135deg, #e74c3c 0%, #922b21 100%); }
+        .result-badge.modric { background: linear-gradient(135deg, #f39c12 0%, #d68910 100%); }
+        .result-badge.mbappe { background: linear-gradient(135deg, #9b59b6 0%, #6c3483 100%); }
+        .result-badge.neymar { background: linear-gradient(135deg, #2ecc71 0%, #1e8449 100%); }
+        .result-badge.van { background: linear-gradient(135deg, #34495e 0%, #1c2833 100%); }
+        .result-badge.haaland { background: linear-gradient(135deg, #00bcd4 0%, #006064 100%); }
+        .result-badge.iniesta { background: linear-gradient(135deg, #e91e63 0%, #880e4f 100%); }
+        
+        .result-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .result-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .result-description {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: left;
+            line-height: 1.8;
+            color: #444;
+            font-size: 15px;
+            margin-bottom: 30px;
+            white-space: pre-line;
+        }
+        .restart-btn {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #52b788 0%, #2d6a4f 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(82, 183, 136, 0.4);
+        }
+        
+        .stats-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            background: #f0fff4;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #2d6a4f;
+        }
+        
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .mbti-header { padding: 20px; }
+            .mbti-header h1 { font-size: 22px; }
+            .question-container { padding: 20px; }
+            .question-text { font-size: 16px; }
+            .option { padding: 12px 15px; }
+            .option-text { font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="mbti-container">
+        <div class="mbti-header">
+            <h1>⚽ SJB-BTI</h1>
+            <p>世界杯球星人格测试 - 探索你的足球灵魂</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <div class="progress-text">
+                <span id="currentQuestion">1</span> / <span id="totalQuestions">30</span>
+            </div>
+        </div>
+        
+        <div class="question-container" id="questionContainer">
+            <div class="question-number" id="questionNumber">第 1 题</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn prev-btn" id="prevBtn" onclick="prevQuestion()">上一题</button>
+            <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()" disabled>下一题</button>
+        </div>
+        
+        <div class="result-container" id="resultContainer">
+            <div class="result-badge" id="resultBadge"></div>
+            <h2 class="result-title" id="resultTitle">测试结果</h2>
+            <p class="result-subtitle" id="resultSubtitle">你的世界杯球星人格是...</p>
+            <div class="stats-container" id="statsContainer"></div>
+            <div class="result-description" id="resultDescription"></div>
+            <button class="restart-btn" onclick="restartTest()">重新测试</button>
+        </div>
+    </div>
+    
+    <script>
+    // 打乱数组顺序
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+    
+    // 完整题库 (30题，每题8选项)
+    const allQuestions = [
+        {
+            question: "球队落后决赛，你会怎么做？",
+            options: [
+                { type: "messi", text: "细腻传球创造机会，安抚队友" },
+                { type: "ronaldo", text: "拼尽全力进球扭转，绝不认输" },
+                { type: "modric", text: "冷静梳理节奏，寻找漏洞" },
+                { type: "mbappe", text: "高速冲击禁区，带动士气" },
+                { type: "neymar", text: "花式盘带打乱对手，轻松创造机会" },
+                { type: "van", text: "稳固后防，守住底线" },
+                { type: "haaland", text: "专注门前，高效得分" },
+                { type: "iniesta", text: "传导配合，维持团队流畅" }
+            ]
+        },
+        {
+            question: "进球后你的庆祝方式？",
+            options: [
+                { type: "messi", text: "低调指天，安静拥抱队友" },
+                { type: "ronaldo", text: "霸气宣告，气场全开" },
+                { type: "modric", text: "沉稳握拳，快速回位" },
+                { type: "mbappe", text: "狂奔释放，激情冲撞" },
+                { type: "neymar", text: "跳舞搞怪，欢乐氛围" },
+                { type: "van", text: "提醒防守，保持警惕" },
+                { type: "haaland", text: "简单示意，专注比赛" },
+                { type: "iniesta", text: "感谢队友，拥抱配合者" }
+            ]
+        },
+        {
+            question: "日常训练态度？",
+            options: [
+                { type: "messi", text: "低调打磨技术，少社交" },
+                { type: "ronaldo", text: "严苛自律，额外加练" },
+                { type: "modric", text: "复盘录像，拆解战术" },
+                { type: "mbappe", text: "享受对抗，爱和队友打闹" },
+                { type: "neymar", text: "自由发挥，讨厌死板训练" },
+                { type: "van", text: "踏实防守，扛起责任" },
+                { type: "haaland", text: "专注射门，目标明确" },
+                { type: "iniesta", text: "配合传切，带动新人" }
+            ]
+        },
+        {
+            question: "队友产生矛盾时？",
+            options: [
+                { type: "messi", text: "私下沟通，照顾情绪" },
+                { type: "ronaldo", text: "就事论事，场上证明自己" },
+                { type: "modric", text: "理性分析，给出解决方案" },
+                { type: "mbappe", text: "直白表达，吵完即忘" },
+                { type: "neymar", text: "玩笑化解，不纠结对错" },
+                { type: "van", text: "以团队稳定为先，主动调解" },
+                { type: "haaland", text: "专注训练，成绩化解分歧" },
+                { type: "iniesta", text: "温柔调和，照顾双方感受" }
+            ]
+        },
+        {
+            question: "你心中足球最重要的是？",
+            options: [
+                { type: "messi", text: "技术创造力与团队默契" },
+                { type: "ronaldo", text: "冠军荣誉与自我突破" },
+                { type: "modric", text: "战术大局与节奏掌控" },
+                { type: "mbappe", text: "激情速度与进攻冲击力" },
+                { type: "neymar", text: "快乐自由与艺术感" },
+                { type: "van", text: "团队防守与责任感" },
+                { type: "haaland", text: "高效得分与刻苦务实" },
+                { type: "iniesta", text: "团队协作与融洽氛围" }
+            ]
+        },
+        {
+            question: "被外界质疑时？",
+            options: [
+                { type: "messi", text: "默默提升，用表现回应" },
+                { type: "ronaldo", text: "加倍训练，高调证明自己" },
+                { type: "modric", text: "冷静补强，用数据说话" },
+                { type: "mbappe", text: "赛场碾压，打破偏见" },
+                { type: "neymar", text: "不在意评价，开心踢球" },
+                { type: "van", text: "稳定防守，让人放心" },
+                { type: "haaland", text: "专注进球，不关心外界" },
+                { type: "iniesta", text: "温和做事，赢得尊重" }
+            ]
+        },
+        {
+            question: "空闲休息时？",
+            options: [
+                { type: "messi", text: "独处陪伴家人，避开喧闹" },
+                { type: "ronaldo", text: "健身房加练，规划目标" },
+                { type: "modric", text: "研究战术，观看比赛录像" },
+                { type: "mbappe", text: "和队友聚会，热闹社交" },
+                { type: "neymar", text: "随性放松，不受规则束缚" },
+                { type: "van", text: "安静休整，少外出应酬" },
+                { type: "haaland", text: "简单恢复，快速回归训练" },
+                { type: "iniesta", text: "和队友小聚，维系关系" }
+            ]
+        },
+        {
+            question: "教练布置死板战术？",
+            options: [
+                { type: "messi", text: "框架内灵活创造，细腻传球" },
+                { type: "ronaldo", text: "严格执行，主动寻找突破" },
+                { type: "modric", text: "理解逻辑，赛场微调节奏" },
+                { type: "mbappe", text: "积极前插，贯彻进攻" },
+                { type: "neymar", text: "偶尔自由发挥，制造惊喜" },
+                { type: "van", text: "坚守站位，绝不擅离" },
+                { type: "haaland", text: "埋伏禁区，完成得分" },
+                { type: "iniesta", text: "传导拉扯，团队配合" }
+            ]
+        },
+        {
+            question: "你更欣赏的赛场特质？",
+            options: [
+                { type: "messi", text: "细腻盘带，温柔包容" },
+                { type: "ronaldo", text: "永不言弃，极致自律" },
+                { type: "modric", text: "运筹帷幄，理性冷静" },
+                { type: "mbappe", text: "极速冲击，热血活力" },
+                { type: "neymar", text: "潇洒灵动，自由随性" },
+                { type: "van", text: "沉稳强硬，坚守防线" },
+                { type: "haaland", text: "朴实勤奋，高效终结" },
+                { type: "iniesta", text: "温和无私，凝聚全队" }
+            ]
+        },
+        {
+            question: "球队长时间平局？",
+            options: [
+                { type: "messi", text: "穿插拉扯，寻找致命机会" },
+                { type: "ronaldo", text: "频繁抢点，主动攻坚" },
+                { type: "modric", text: "放慢节奏，等待最佳时机" },
+                { type: "mbappe", text: "边路突击，制造定位球" },
+                { type: "neymar", text: "单兵突破，灵光一现" },
+                { type: "van", text: "稳固后场，等待反击" },
+                { type: "haaland", text: "埋伏门前，抓住得分机会" },
+                { type: "iniesta", text: "来回传导，创造空位" }
+            ]
+        },
+        {
+            question: "面对关键点球？",
+            options: [
+                { type: "messi", text: "沉稳助跑，细腻推射" },
+                { type: "ronaldo", text: "霸气助跑，全力爆射" },
+                { type: "modric", text: "冷静观察，精准角度" },
+                { type: "mbappe", text: "果断射门，自信满满" },
+                { type: "neymar", text: "轻巧巧射，随性发挥" },
+                { type: "van", text: "稳健防守，拒绝失点" },
+                { type: "haaland", text: "直接打门，追求角度" },
+                { type: "iniesta", text: "平稳心态，专注配合" }
+            ]
+        },
+        {
+            question: "队友失误丢球？",
+            options: [
+                { type: "messi", text: "拍拍队友，鼓励再战" },
+                { type: "ronaldo", text: "提醒专注，快速回防" },
+                { type: "modric", text: "梳理防线，重新组织" },
+                { type: "mbappe", text: "大声鼓舞，带动情绪" },
+                { type: "neymar", text: "玩笑化解，缓解尴尬" },
+                { type: "van", text: "补位防守，稳住局面" },
+                { type: "haaland", text: "专注进攻，弥补失误" },
+                { type: "iniesta", text: "安抚队友，重新配合" }
+            ]
+        },
+        {
+            question: "选择球衣号码？",
+            options: [
+                { type: "messi", text: "低调经典，象征信仰" },
+                { type: "ronaldo", text: "霸气专属，彰显地位" },
+                { type: "modric", text: "中场核心，战术意义" },
+                { type: "mbappe", text: "年轻活力，冲击象征" },
+                { type: "neymar", text: "个性独特，时尚吸睛" },
+                { type: "van", text: "后防领袖，稳固号码" },
+                { type: "haaland", text: "简单直接，射手标识" },
+                { type: "iniesta", text: "团队象征，低调无私" }
+            ]
+        },
+        {
+            question: "赛前准备心态？",
+            options: [
+                { type: "messi", text: "平静专注，沉浸自我" },
+                { type: "ronaldo", text: "亢奋激昂，充满斗志" },
+                { type: "modric", text: "冷静分析，制定策略" },
+                { type: "mbappe", text: "热血沸腾，迫不及待" },
+                { type: "neymar", text: "轻松愉悦，享受氛围" },
+                { type: "van", text: "沉稳坚定，守护团队" },
+                { type: "haaland", text: "专注目标，简单准备" },
+                { type: "iniesta", text: "平和从容，团结队友" }
+            ]
+        },
+        {
+            question: "对手恶意犯规？",
+            options: [
+                { type: "messi", text: "默默起身，继续比赛" },
+                { type: "ronaldo", text: "强硬回击，用进球证明" },
+                { type: "modric", text: "冷静应对，遵守规则" },
+                { type: "mbappe", text: "正面对抗，毫不畏惧" },
+                { type: "neymar", text: "灵活躲避，花式摆脱" },
+                { type: "van", text: "强硬防守，保护队友" },
+                { type: "haaland", text: "无视干扰，专注射门" },
+                { type: "iniesta", text: "温和避让，维持节奏" }
+            ]
+        },
+        {
+            question: "世界杯夺冠瞬间？",
+            options: [
+                { type: "messi", text: "静静流泪，感恩团队" },
+                { type: "ronaldo", text: "怒吼庆祝，宣告王者" },
+                { type: "modric", text: "沉稳微笑，享受胜利" },
+                { type: "mbappe", text: "疯狂奔跑，释放激情" },
+                { type: "neymar", text: "和队友嬉闹，欢乐庆祝" },
+                { type: "van", text: "和后防相拥，共享荣耀" },
+                { type: "haaland", text: "简单庆祝，专注下一场" },
+                { type: "iniesta", text: "拥抱全队，感谢每个人" }
+            ]
+        },
+        {
+            question: "对待年轻球员？",
+            options: [
+                { type: "messi", text: "耐心指导，分享经验" },
+                { type: "ronaldo", text: "严格要求，激励成长" },
+                { type: "modric", text: "传授战术，指点大局" },
+                { type: "mbappe", text: "一起打闹，带动活力" },
+                { type: "neymar", text: "轻松相处，鼓励创意" },
+                { type: "van", text: "保护新人，传授防守" },
+                { type: "haaland", text: "简单交流，专注训练" },
+                { type: "iniesta", text: "温柔照顾，帮助融入" }
+            ]
+        },
+        {
+            question: "比赛中被换下？",
+            options: [
+                { type: "messi", text: "平静接受，鼓励队友" },
+                { type: "ronaldo", text: "不甘离场，渴望再战" },
+                { type: "modric", text: "理性看待，服从安排" },
+                { type: "mbappe", text: "略显失落，快速调整" },
+                { type: "neymar", text: "随性对待，轻松看待" },
+                { type: "van", text: "坚守职责，做好后盾" },
+                { type: "haaland", text: "专注等待，随时待命" },
+                { type: "iniesta", text: "微笑致意，感谢队友" }
+            ]
+        },
+        {
+            question: "处理赛场压力？",
+            options: [
+                { type: "messi", text: "内心沉淀，专注脚下" },
+                { type: "ronaldo", text: "化压力为动力，全力拼搏" },
+                { type: "modric", text: "理性分析，缓解紧张" },
+                { type: "mbappe", text: "用奔跑释放，热血对抗" },
+                { type: "neymar", text: "轻松心态，享受比赛" },
+                { type: "van", text: "沉稳抗压，守护防线" },
+                { type: "haaland", text: "专注任务，减少内耗" },
+                { type: "iniesta", text: "平和心态，团结团队" }
+            ]
+        },
+        {
+            question: "选择踢球风格？",
+            options: [
+                { type: "messi", text: "技术流，细腻控球" },
+                { type: "ronaldo", text: "全能流，暴力美学" },
+                { type: "modric", text: "组织流，中场调度" },
+                { type: "mbappe", text: "速度流，边路突击" },
+                { type: "neymar", text: "艺术流，花式盘带" },
+                { type: "van", text: "防守流，强硬拦截" },
+                { type: "haaland", text: "射手流，门前终结" },
+                { type: "iniesta", text: "配合流，无私传球" }
+            ]
+        },
+        {
+            question: "面对媒体采访？",
+            options: [
+                { type: "messi", text: "低调谦逊，少谈自己" },
+                { type: "ronaldo", text: "自信霸气，展现野心" },
+                { type: "modric", text: "理性客观，分析比赛" },
+                { type: "mbappe", text: "直率开朗，轻松回应" },
+                { type: "neymar", text: "幽默风趣，随性回答" },
+                { type: "van", text: "沉稳务实，专注团队" },
+                { type: "haaland", text: "简单直接，少说多做" },
+                { type: "iniesta", text: "温和友善，夸赞队友" }
+            ]
+        },
+        {
+            question: "训练中遇到瓶颈？",
+            options: [
+                { type: "messi", text: "默默钻研，打磨细节" },
+                { type: "ronaldo", text: "加倍苦练，突破自我" },
+                { type: "modric", text: "复盘总结，寻找方法" },
+                { type: "mbappe", text: "大胆尝试，突破局限" },
+                { type: "neymar", text: "随性调整，寻找乐趣" },
+                { type: "van", text: "扎实训练，稳固基础" },
+                { type: "haaland", text: "专注专项，提升效率" },
+                { type: "iniesta", text: "请教交流，慢慢改进" }
+            ]
+        },
+        {
+            question: "球队更衣室氛围？",
+            options: [
+                { type: "messi", text: "安静低调，专注备战" },
+                { type: "ronaldo", text: "鼓舞士气，带动斗志" },
+                { type: "modric", text: "理性沟通，协调战术" },
+                { type: "mbappe", text: "热闹活跃，带动气氛" },
+                { type: "neymar", text: "轻松欢乐，玩笑不断" },
+                { type: "van", text: "沉稳严肃，强调纪律" },
+                { type: "haaland", text: "简单安静，专注休息" },
+                { type: "iniesta", text: "温和融洽，团结队友" }
+            ]
+        },
+        {
+            question: "客场作战环境？",
+            options: [
+                { type: "messi", text: "专注自我，不受干扰" },
+                { type: "ronaldo", text: "无视噪音，全力争胜" },
+                { type: "modric", text: "冷静适应，调整战术" },
+                { type: "mbappe", text: "兴奋迎战，挑战氛围" },
+                { type: "neymar", text: "随性适应，享受客场" },
+                { type: "van", text: "沉稳应对，稳固防守" },
+                { type: "haaland", text: "专注比赛，无视环境" },
+                { type: "iniesta", text: "平和心态，团队协作" }
+            ]
+        },
+        {
+            question: "职业生涯目标？",
+            options: [
+                { type: "messi", text: "享受足球，团队荣耀" },
+                { type: "ronaldo", text: "不断夺冠，成为传奇" },
+                { type: "modric", text: "掌控比赛，成为中场大脑" },
+                { type: "mbappe", text: "突破极限，冲击巅峰" },
+                { type: "neymar", text: "快乐踢球，展现艺术" },
+                { type: "van", text: "守护球队，成为后防基石" },
+                { type: "haaland", text: "高效进球，成为顶级射手" },
+                { type: "iniesta", text: "团队共赢，无私奉献" }
+            ]
+        },
+        {
+            question: "比赛中队友状态低迷？",
+            options: [
+                { type: "messi", text: "主动传球，帮助找回信心" },
+                { type: "ronaldo", text: "大声激励，带动斗志" },
+                { type: "modric", text: "梳理节奏，帮助调整" },
+                { type: "mbappe", text: "配合进攻，提升士气" },
+                { type: "neymar", text: "轻松互动，缓解压力" },
+                { type: "van", text: "稳固防守，给予安全感" },
+                { type: "haaland", text: "积极跑位，创造机会" },
+                { type: "iniesta", text: "温柔鼓励，耐心配合" }
+            ]
+        },
+        {
+            question: "对待胜负结果？",
+            options: [
+                { type: "messi", text: "平静接受，总结经验" },
+                { type: "ronaldo", text: "渴望胜利，绝不接受失败" },
+                { type: "modric", text: "理性看待，分析得失" },
+                { type: "mbappe", text: "胜则兴奋，败则不甘" },
+                { type: "neymar", text: "享受过程，看淡结果" },
+                { type: "van", text: "尽力而为，无愧团队" },
+                { type: "haaland", text: "专注进球，结果顺其自然" },
+                { type: "iniesta", text: "团队为重，平和对待" }
+            ]
+        },
+        {
+            question: "个人技术特点？",
+            options: [
+                { type: "messi", text: "控球细腻，传球精准" },
+                { type: "ronaldo", text: "身体强悍，射门暴力" },
+                { type: "modric", text: "视野开阔，调度出色" },
+                { type: "mbappe", text: "速度极快，突破犀利" },
+                { type: "neymar", text: "盘带华丽，技巧丰富" },
+                { type: "van", text: "卡位精准，防守强硬" },
+                { type: "haaland", text: "跑位聪明，终结高效" },
+                { type: "iniesta", text: "传球隐蔽，配合默契" }
+            ]
+        },
+        {
+            question: "赛场领袖气质？",
+            options: [
+                { type: "messi", text: "低调引领，用实力说话" },
+                { type: "ronaldo", text: "霸气担当，精神领袖" },
+                { type: "modric", text: "战术核心，理性引领" },
+                { type: "mbappe", text: "活力四射，激情带动" },
+                { type: "neymar", text: "轻松随性，氛围领袖" },
+                { type: "van", text: "沉稳可靠，后防领袖" },
+                { type: "haaland", text: "专注务实，行动引领" },
+                { type: "iniesta", text: "温和包容，团队粘合剂" }
+            ]
+        },
+        {
+            question: "最想成为的球员类型？",
+            options: [
+                { type: "messi", text: "技术超凡，低调伟大" },
+                { type: "ronaldo", text: "自律极致，永不言败" },
+                { type: "modric", text: "智慧控球，中场大师" },
+                { type: "mbappe", text: "年轻无畏，速度之王" },
+                { type: "neymar", text: "自由灵动，足球艺术家" },
+                { type: "van", text: "铁血防守，团队后盾" },
+                { type: "haaland", text: "纯粹射手，高效进球" },
+                { type: "iniesta", text: "温柔无私，团队核心" }
+            ]
+        }
+    ];
+    
+    const playerTypes = {
+        messi: {
+            name: "梅西",
+            title: "内敛创造型",
+            icon: "⚽",
+            description: "核心特质：共情力强、天赋拉满、不喜争辩、隐忍温柔、擅长用细腻技术盘活全队，看重团队默契与纯粹足球，不善社交，内心柔软，逆境中默默扛下所有压力。\n\n优势：创造力、短传配合、情绪包容、绝境稳定发挥\n短板：不擅长主动发声领导，容易过度迁就他人"
+        },
+        ronaldo: {
+            name: "C罗",
+            title: "自律征服者",
+            icon: "👑",
+            description: "核心特质：胜负欲极强、高度自律、目标清晰、气场强大、永远不甘平庸，敢于直面争议，天生领袖，愿意为冠军付出一切代价，极度看重自我成长与荣誉。\n\n优势：抗压能力、斗志、领导力、极致执行力\n短板：好胜心过重，偶尔过于强势，忽略他人情绪"
+        },
+        modric: {
+            name: "莫德里奇",
+            title: "冷静战术家",
+            icon: "🎯",
+            description: "核心特质：理性通透、大局观顶尖、擅长阅读比赛、情绪稳定不急躁，习惯复盘总结，掌控赛场节奏，不靠蛮力靠智慧赢球，抗压能力顶级。\n\n优势：战术理解、节奏把控、逆境冷静、长远规划\n短板：不善表达情绪，很难完全敞开心扉"
+        },
+        mbappe: {
+            name: "姆巴佩",
+            title: "热血突击手",
+            icon: "⚡",
+            description: "核心特质：外向热烈、爆发力十足、敢闯敢拼、直率坦荡，享受赛场和人群，敢挑战权威，精力充沛，不记仇，爱恨直白。\n\n优势：冲劲、行动力、感染力、快速适应新环境\n短板：耐心不足，容易冲动行事"
+        },
+        neymar: {
+            name: "内马尔",
+            title: "浪漫自由派",
+            icon: "🎭",
+            description: "核心特质：乐观随性、热爱自由、擅长花式技巧，讨厌死板规则，看重踢球的快乐，擅长用轻松氛围化解紧张，天性浪漫洒脱。\n\n优势：创造力、乐观心态、个人突破、调节团队气氛\n短板：纪律性偏弱，抗压心态容易浮躁"
+        },
+        van: {
+            name: "范戴克",
+            title: "铁血守护者",
+            icon: "🛡️",
+            description: "核心特质：稳重可靠、责任感极强、团队至上，性格强硬有底线，愿意兜底全队，遇事优先考虑集体安危，踏实靠谱。\n\n优势：抗压兜底、责任心、处事稳重、大局为重\n短板：不擅长灵活变通，偶尔过于保守"
+        },
+        haaland: {
+            name: "哈兰德",
+            title: "纯粹终结者",
+            icon: "🎯",
+            description: "核心特质：简单直接、专注目标、埋头苦练、不爱复杂社交，做事高效务实，心无旁骛只专注自身核心任务，极少内耗。\n\n优势：执行力、吃苦耐劳、目标专一、高效务实\n短板：共情力偏弱，不擅长协调人际关系"
+        },
+        iniesta: {
+            name: "伊涅斯塔",
+            title: "温柔粘合剂",
+            icon: "🤝",
+            description: "核心特质：温和无私、擅长调和队内关系，低调不争风头，乐于给队友做嫁衣，细腻无私，总能平衡团队所有人的感受。\n\n优势：团队协作、共情调和、细腻配合、待人温和\n短板：缺少强势话语权，不擅长主动争取机会"
+        }
+    };
+    
+    // 测试配置
+    const TEST_QUESTIONS_COUNT = 30; // 全部30题
+    
+    // 状态变量
+    let questions = [];
+    let currentQuestionIndex = 0;
+    let answers = {};
+    let shuffledOptions = {}; // 记录每道题打乱后的选项顺序
+    
+    function init() {
+        // 使用全部题目
+        questions = [...allQuestions];
+        
+        document.getElementById('totalQuestions').textContent = questions.length;
+        loadQuestion();
+    }
+    
+    function loadQuestion() {
+        const question = questions[currentQuestionIndex];
+        
+        document.getElementById('currentQuestion').textContent = currentQuestionIndex + 1;
+        document.getElementById('progressFill').style.width = ((currentQuestionIndex + 1) / questions.length * 100) + '%';
+        document.getElementById('questionNumber').textContent = '第 ' + (currentQuestionIndex + 1) + ' 题';
+        document.getElementById('questionText').textContent = question.question;
+        
+        const optionsContainer = document.getElementById('optionsContainer');
+        optionsContainer.innerHTML = '';
+        
+        // 如果这道题还没打乱过选项，先打乱
+        if (!shuffledOptions[currentQuestionIndex]) {
+            // 复制选项并打乱顺序
+            shuffledOptions[currentQuestionIndex] = shuffleArray([...question.options]);
+        }
+        
+        const currentOptions = shuffledOptions[currentQuestionIndex];
+        
+        currentOptions.forEach(function(option, index) {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'option' + (answers[currentQuestionIndex] === option.type ? ' selected' : '');
+            optionDiv.onclick = function() { selectOption(option.type); };
+            optionDiv.dataset.type = option.type;
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'option-text';
+            textDiv.textContent = option.text;
+            
+            optionDiv.appendChild(textDiv);
+            optionsContainer.appendChild(optionDiv);
+        });
+        
+        updateNavButtons();
+    }
+    
+    function selectOption(type) {
+        answers[currentQuestionIndex] = type;
+        
+        document.querySelectorAll('.option').forEach(function(opt) {
+            opt.classList.remove('selected');
+            if (opt.dataset.type === type) {
+                opt.classList.add('selected');
+            }
+        });
+        
+        updateNavButtons();
+    }
+    
+    function updateNavButtons() {
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        prevBtn.disabled = currentQuestionIndex === 0;
+        
+        if (currentQuestionIndex === questions.length - 1) {
+            nextBtn.textContent = '查看结果';
+            nextBtn.disabled = !answers[currentQuestionIndex];
+        } else {
+            nextBtn.textContent = '下一题';
+            nextBtn.disabled = !answers[currentQuestionIndex];
+        }
+    }
+    
+    function nextQuestion() {
+        if (currentQuestionIndex === questions.length - 1) {
+            showResult();
+        } else {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+    }
+    
+    function prevQuestion() {
+        if (currentQuestionIndex > 0) {
+            currentQuestionIndex--;
+            loadQuestion();
+        }
+    }
+    
+    function calculateResult() {
+        const counts = {
+            messi: 0,
+            ronaldo: 0,
+            modric: 0,
+            mbappe: 0,
+            neymar: 0,
+            van: 0,
+            haaland: 0,
+            iniesta: 0
+        };
+        
+        Object.values(answers).forEach(function(type) {
+            if (counts.hasOwnProperty(type)) {
+                counts[type]++;
+            }
+        });
+        
+        // 找出最高票数
+        let maxCount = 0;
+        let result = 'messi';
+        for (const type in counts) {
+            if (counts[type] > maxCount) {
+                maxCount = counts[type];
+                result = type;
+            }
+        }
+        
+        return { result: result, counts: counts };
+    }
+    
+    function showResult() {
+        const resultData = calculateResult();
+        const result = resultData.result;
+        const counts = resultData.counts;
+        
+        document.getElementById('questionContainer').style.display = 'none';
+        document.querySelector('.nav-buttons').style.display = 'none';
+        document.querySelector('.mbti-header .progress-text').style.display = 'none';
+        
+        const resultContainer = document.getElementById('resultContainer');
+        resultContainer.classList.add('show');
+        
+        const player = playerTypes[result];
+        
+        const badge = document.getElementById('resultBadge');
+        badge.textContent = player.icon + '\n' + player.name;
+        badge.className = 'result-badge ' + result;
+        
+        document.getElementById('resultTitle').textContent = player.name + ' | ' + player.title;
+        document.getElementById('resultSubtitle').textContent = '你的世界杯球星人格是：' + player.name;
+        
+        const statsContainer = document.getElementById('statsContainer');
+        statsContainer.innerHTML = '';
+        for (const type in counts) {
+            const statItem = document.createElement('div');
+            statItem.className = 'stat-item';
+            statItem.textContent = playerTypes[type].name + ': ' + counts[type] + '次';
+            statsContainer.appendChild(statItem);
+        }
+        
+        document.getElementById('resultDescription').textContent = player.description;
+    }
+    
+    function restartTest() {
+        // 重置状态，重新打乱
+        currentQuestionIndex = 0;
+        answers = {};
+        shuffledOptions = {};
+        
+        document.getElementById('resultContainer').classList.remove('show');
+        document.getElementById('questionContainer').style.display = 'block';
+        document.querySelector('.nav-buttons').style.display = 'flex';
+        document.querySelector('.mbti-header .progress-text').style.display = 'block';
+        
+        init(); // 重新初始化，再次打乱选项
+    }
+    
+    window.onload = function() {
+        init();
+    };
+    </script>
+</body>
+</html>
