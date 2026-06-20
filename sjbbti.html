@@ -226,6 +226,101 @@
             color: #2d6a4f;
         }
         
+        /* 打赏页面样式 */
+        .donation-btn {
+            margin-top: 15px;
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #ffd166 0%, #f4a261 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .donation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(244, 162, 97, 0.4);
+        }
+        
+        .donation-container {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .donation-title {
+            font-size: 28px;
+            color: #2d6a4f;
+            margin-bottom: 10px;
+        }
+        .donation-subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .donation-images {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        .donation-image-box {
+            text-align: center;
+        }
+        .image-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .image-placeholder {
+            width: 180px;
+            height: 180px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fafafa;
+            overflow: hidden;
+        }
+        .image-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .image-placeholder-text {
+            color: #999;
+            font-size: 13px;
+            text-align: center;
+            padding: 10px;
+        }
+        .donation-message {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+        .back-btn {
+            padding: 12px 35px;
+            background: linear-gradient(135deg, #74c0fc 0%, #4dabf7 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(116, 192, 252, 0.4);
+        }
+        
         @media (max-width: 768px) {
             body { padding: 10px; }
             .mbti-header { padding: 20px; }
@@ -234,6 +329,8 @@
             .question-text { font-size: 16px; }
             .option { padding: 12px 15px; }
             .option-text { font-size: 14px; }
+            .donation-images { gap: 15px; }
+            .image-placeholder { width: 150px; height: 150px; }
         }
     </style>
 </head>
@@ -267,6 +364,32 @@
             <p class="result-subtitle" id="resultSubtitle">你的世界杯球星人格是...</p>
             <div class="stats-container" id="statsContainer"></div>
             <div class="result-description" id="resultDescription"></div>
+            <button class="restart-btn" onclick="restartTest()">重新测试</button>
+            <button class="donation-btn" onclick="showDonation()">支持作者</button>
+        </div>
+        
+        <div class="donation-container" id="donationContainer">
+            <h2 class="donation-title">☕ 支持作者</h2>
+            <p class="donation-subtitle">如果觉得测试有趣，欢迎打赏支持</p>
+            
+            <div class="donation-images">
+                <div class="donation-image-box">
+                    <p class="image-label">微信赞赏码</p>
+                    <!-- 在这里添加微信赞赏码图片 -->
+                    <div class="image-placeholder">
+                        <img src="2C75194D64BA5300CCF75002D8D0A646.png" alt="微信赞赏码" id="wechatImage" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="image-placeholder-text" style="display: none;">
+                            <span>请添加微信赞赏码图片</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="donation-message">
+                <p>您的支持是我继续创作的动力 ❤️</p>
+            </div>
+            
+            <button class="back-btn" onclick="backToResult()">返回结果</button>
             <button class="restart-btn" onclick="restartTest()">重新测试</button>
         </div>
     </div>
@@ -888,12 +1011,25 @@
         document.getElementById('resultDescription').textContent = player.description;
     }
     
+    // 显示打赏页面
+    function showDonation() {
+        document.getElementById('resultContainer').classList.remove('show');
+        document.getElementById('donationContainer').style.display = 'block';
+    }
+    
+    // 返回结果页面
+    function backToResult() {
+        document.getElementById('donationContainer').style.display = 'none';
+        document.getElementById('resultContainer').classList.add('show');
+    }
+    
     function restartTest() {
         // 重置状态，重新打乱
         currentQuestionIndex = 0;
         answers = {};
         shuffledOptions = {};
         
+        document.getElementById('donationContainer').style.display = 'none';
         document.getElementById('resultContainer').classList.remove('show');
         document.getElementById('questionContainer').style.display = 'block';
         document.querySelector('.nav-buttons').style.display = 'flex';
